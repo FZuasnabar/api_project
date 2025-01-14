@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta RUC</title>
+    <link rel="stylesheet" href="/static/css/consulta-style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Consulta de RUC</h1>
+        <form id="consulta-form">
+            <label for="ruc">Ingrese el RUC:</label>
+            <input type="text" id="ruc" name="ruc" required>
+            <button type="button" id="buscar-btn">Buscar</button>
+        </form>
+        <p id="consulta-error" style="color: red;"></p>
+    </div>
+
+    <script>
+        // Función de consulta de RUC
+        document.getElementById("buscar-btn").addEventListener("click", function() {
+            const ruc = document.getElementById("ruc").value;
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                document.getElementById("consulta-error").textContent = "Token no válido o sesión expirada.";
+                return;
+            }
+
+            // Enviar el RUC al servidor
+            fetch("/ruc-info", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ ruc: ruc })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("consulta-error").textContent = data.error;
+                } else {
+                    // Redirigir a /ruc-info con el ruc como parámetro en la URL
+                    window.location.href = `/ruc-info?ruc=${data.RUC}`;
+                }
+            })
+            .catch(error => {
+                document.getElementById("consulta-error").textContent = "Error al conectar con el servidor.";
+            });
+        });
+    </script>
+</body>
+</html>

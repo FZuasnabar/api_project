@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Información RUC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ruc-info-style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Información del RUC</h1>
+        </header>
+        
+        {% if ruc_data %}
+            <div class="ruc-info">
+                <table>
+                    <tr>
+                        <th>RUC</th>
+                        <td>{{ ruc_data.RUC }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nombre</th>
+                        <td>{{ ruc_data.NOMBRE }}</td>
+                    </tr>
+                    <tr>
+                        <th>Estado</th>
+                        <td>{{ ruc_data.ESTADO }}</td>
+                    </tr>
+                    <tr>
+                        <th>Condición</th>
+                        <td>{{ ruc_data.CONDICION }}</td>
+                    </tr>
+                    <tr>
+                        <th>Ubigeo</th>
+                        <td>{{ ruc_data.UBIGEO }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tipo de Vía</th>
+                        <td>{{ ruc_data.TIPO_VIA }}</td>
+                    </tr>
+                    <tr>
+                        <th>Nombre de Vía</th>
+                        <td>{{ ruc_data.NOMBRE_VIA }}</td>
+                    </tr>
+                    <tr>
+                        <th>Código de Zona</th>
+                        <td>{{ ruc_data.COD_ZONA }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tipo de Zona</th>
+                        <td>{{ ruc_data.TIPO_ZONA }}</td>
+                    </tr>
+                    <tr>
+                        <th>Número</th>
+                        <td>{{ ruc_data.NUMERO }}</td>
+                    </tr>
+                    <tr>
+                        <th>Interior</th>
+                        <td>{{ ruc_data.INTERIOR }}</td>
+                    </tr>
+                    <tr>
+                        <th>Lote</th>
+                        <td>{{ ruc_data.LOTE }}</td>
+                    </tr>
+                    <tr>
+                        <th>Departamento</th>
+                        <td>{{ ruc_data.DEPARTAMENTO }}</td>
+                    </tr>
+                    <tr>
+                        <th>Manzana</th>
+                        <td>{{ ruc_data.MANZANA }}</td>
+                    </tr>
+                    <tr>
+                        <th>Kilómetro</th>
+                        <td>{{ ruc_data.KILOMETRO }}</td>
+                    </tr>
+                </table>
+            </div>
+        {% else %}
+            <div class="error-message">
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
+
+        <div class="back-button">
+            <a href="/consulta">Volver a Consulta</a>
+        </div>
+    </div>
+</body>
+</html>

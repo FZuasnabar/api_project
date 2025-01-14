@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login-style.css') }}">
+</head>
+<body>
+    <div class="login-container">
+        <form id="login-form">
+            <h2>Iniciar Sesión</h2>
+            <div class="input-group">
+                <label for="user_ruc">RUC</label>
+                <input type="text" id="user_ruc" name="user_ruc" placeholder="Ingresa tu RUC" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="Ingresa tu contraseña" required>
+            </div>
+            <button type="submit">Iniciar Sesión</button>
+            <div id="login-error" class="error-message"></div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault();  // Evita el envío tradicional del formulario
+
+            const user_ruc = document.getElementById("user_ruc").value;
+            const password = document.getElementById("password").value;
+
+            // Enviar los datos al backend con fetch usando POST
+            fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ username: user_ruc, password: password }) // Se envían como JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.token) {
+                    // Si se recibe el token, lo guardamos en localStorage y redirigimos
+                    localStorage.setItem("token", data.token);
+                    window.location.href = "/consulta"; // Redirigir a la página de consulta
+                } else {
+                    // Si hay error en las credenciales, mostramos el mensaje de error
+                    document.getElementById("login-error").textContent = data.error || "Error desconocido.";
+                }
+            })
+            .catch(error => {
+                // Si hay un error al hacer la solicitud, mostramos un error genérico
+                document.getElementById("login-error").textContent = "Error al conectar con el servidor.";
+            });
+        });
+    </script>
+</body>
+</html>
