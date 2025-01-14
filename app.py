@@ -1,21 +1,26 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for
+from flask import Flask, request, jsonify, render_template
 import os
 import pymysql
 import secrets
+from pymysql import pooling
 
 app = Flask(__name__)
 
-# Crear la conexión a la base de datos solo cuando sea necesario
+# Configuración del pool de conexiones (global)
+connection_pool = pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=5,  # Puedes ajustar el tamaño del pool según tus necesidades
+    host='38.43.130.178',  # IP pública o nombre DNS de tu base de datos
+    user='cliente',  # Usuario creado para conexiones remotas
+    password='password',  # Contraseña del usuario
+    database='bd_prueba',  # Nombre de tu base de datos
+    port=3306,  # Puerto MySQL (3306 por defecto)
+    cursorclass=pymysql.cursors.DictCursor,
+)
+
 def get_db_connection():
-    return pymysql.connect(
-        host='38.43.130.178',  # IP pública o nombre DNS de tu base de datos
-        user='cliente',      # Usuario creado para conexiones remotas
-        password='password',  # Contraseña del usuario
-        database='bd_prueba',  # Nombre de tu base de datos
-        port=3306,               # Puerto MySQL (3306 por defecto)
-        cursorclass=pymysql.cursors.DictCursor
-        ssl={'ca': r'D:\project-folder\ca.pem'}
-    )
+    # Obtener una conexión del pool
+    return connection_pool.get_connection()
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -43,7 +48,7 @@ def login():
 
                 with connection.cursor() as cursor:
                     # Insertar o actualizar el token en la tabla 'tokens'
-                    cursor.execute("""
+                    cursor.execute(""" 
                         INSERT INTO tokens (token, user_ruc, created_at)
                         VALUES (%s, %s, NOW())
                         ON DUPLICATE KEY UPDATE token = VALUES(token), created_at = NOW();
@@ -61,7 +66,7 @@ def login():
             connection.close()
 
     return render_template('login.html')  # Si es un GET, renderiza el formulario de login
-    
+
 @app.route('/consulta', methods=['GET', 'POST'])
 def consulta():
     # Si es un GET, muestra la página para ingresar el RUC
@@ -124,12 +129,8 @@ def ruc_info():
         finally:
             connection.close()
 
-
-
-
-
 if __name__ == '__main__':
+    # Ejecuta la app en el puerto asignado por Heroku
     import os
     port = int(os.environ.get('PORT', 5000))  # Heroku asigna un puerto dinámico
-    app.run(debug=True, host='0.0.0.0', port=port)
-
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
