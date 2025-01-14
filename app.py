@@ -6,22 +6,17 @@ from pymysql import pooling
 
 app = Flask(__name__)
 
-# Configuración del pool de conexiones
-def create_db_pool():
-    return pooling.MySQLConnectionPool(
-        pool_name="mypool",
-        pool_size=5,  # Puedes ajustar el tamaño del pool según tus necesidades
-        host='38.43.130.178',  # IP pública o nombre DNS de tu base de datos
-        user='cliente',  # Usuario creado para conexiones remotas
-        password='password',  # Contraseña del usuario
-        database='bd_prueba',  # Nombre de tu base de datos
-        port=3306,  # Puerto MySQL (3306 por defecto)
-        cursorclass=pymysql.cursors.DictCursor,
-        ssl={'ca': r'D:\project-folder\ca.pem'}  # Configuración de SSL para la conexión segura
-    )
-
-# Crear una instancia del pool de conexiones
-connection_pool = create_db_pool()
+# Configuración del pool de conexiones (global)
+connection_pool = pooling.MySQLConnectionPool(
+    pool_name="mypool",
+    pool_size=5,  # Puedes ajustar el tamaño del pool según tus necesidades
+    host='38.43.130.178',  # IP pública o nombre DNS de tu base de datos
+    user='cliente',  # Usuario creado para conexiones remotas
+    password='password',  # Contraseña del usuario
+    database='bd_prueba',  # Nombre de tu base de datos
+    port=3306,  # Puerto MySQL (3306 por defecto)
+    cursorclass=pymysql.cursors.DictCursor,
+)
 
 def get_db_connection():
     # Obtener una conexión del pool
@@ -135,6 +130,7 @@ def ruc_info():
             connection.close()
 
 if __name__ == '__main__':
+    # Ejecuta la app en el puerto asignado por Heroku
     import os
     port = int(os.environ.get('PORT', 5000))  # Heroku asigna un puerto dinámico
-    app.run(debug=True, host='0.0.0.0', port=port)
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
